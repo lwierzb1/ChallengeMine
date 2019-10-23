@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.database.FirebaseRecyclerAdapter
@@ -20,9 +21,14 @@ import com.google.firebase.database.ValueEventListener
 import com.mancj.materialsearchbar.MaterialSearchBar
 import com.project.challengemine.Interface.IFirebaseLoadDone
 import com.project.challengemine.Interface.IRecyclerItemClickListener
+import com.project.challengemine.Model.MyResponse
+import com.project.challengemine.Model.Request
 import com.project.challengemine.Model.User
 import com.project.challengemine.Util.Common
 import com.project.challengemine.ViewHolder.UserViewHolder
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_all_people.*
 
 class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
@@ -33,6 +39,9 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
 
     lateinit var iFirebaseLoadDone: IFirebaseLoadDone
     var suggestedList:List< String > = ArrayList()
+
+    val compositeDisposable = CompositeDisposable()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +67,7 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
         })
         material_search_bar.setOnSearchActionListener( object: MaterialSearchBar.OnSearchActionListener{
             override fun onButtonClicked(buttonCode: Int) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onSearchStateChanged(enabled: Boolean) {
@@ -113,14 +122,12 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
 
                 holder.setClick( object:IRecyclerItemClickListener{
                     override fun onItemClickListener(view: View, position: Int) {
-
+                        showDialogRequest( model )
                     }
 
                 })
 
             }
-
-
         }
         searchAdapter!!.startListening()
 
@@ -175,7 +182,7 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
 
                 holder.setClick( object:IRecyclerItemClickListener{
                     override fun onItemClickListener(view: View, position: Int) {
-
+                        showDialogRequest( model )
                     }
 
                 })
@@ -189,12 +196,92 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
         recycler_all_people.adapter = adapter;
     }
 
+    private fun showDialogRequest(model: User) {
+        var alertDialog = AlertDialog.Builder( this, R.style.MyRequestDialog)
+        alertDialog.setTitle( "Duel Request" )
+        alertDialog.setMessage( StringBuilder("Do You want to send duel request to ")
+            .append( model.name )
+            .append( "( ")
+            .append( model.email)
+            .append( " )"))
+        alertDialog.setIcon( R.drawable.ic_challenge_mine_icon)
+        alertDialog.setNegativeButton( "Cancel", { dialogInterface, _ -> dialogInterface.dismiss() })
+        alertDialog.setPositiveButton( "Send") { _ , _->
+            val acceptList = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
+                .child( Common.loggedUser.uid!! )
+                .child( Common.ACCEPT_LIST )
+
+            //check if user is not already in duel
+            acceptList.orderByKey().equalTo( model.uid )
+                .addListenerForSingleValueEvent( object:ValueEventListener {
+                    override fun onCancelled(p0: DatabaseError) {
+
+                    }
+
+                    override fun onDataChange(p0: DataSnapshot) {
+                        if (p0.value == null) //not in duel
+                            sendDuelRequest( model )
+                        else
+                            Toast.makeText( this@AllPeopleActivity,
+                                "You are already in duel", Toast.LENGTH_LONG).show()
+                    }
+                })
+        }
+
+        alertDialog.show()
+    }
+
+    private fun sendDuelRequest(model: User) {
+        //get token to send duel request
+
+        val tokens = FirebaseDatabase.getInstance().getReference( Common.TOKENS )
+        tokens.orderByKey().equalTo( model.uid ).addListenerForSingleValueEvent( object:ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                if( p0.value == null ) // tokens not available
+                    Toast.makeText( this@AllPeopleActivity,
+                        "Tokens not available", Toast.LENGTH_SHORT).show()
+                else {
+                    val request = Request()
+
+                    val dataSend = HashMap< String, String >()
+                    dataSend[ Common.FROM_UID ] = Common.loggedUser.uid!!
+                    dataSend[ Common.FROM_EMAIL ] = Common.loggedUser.email!!
+                    dataSend[ Common.FROM_USER ] = Common.loggedUser.name!!
+
+                    dataSend[ Common.TO_UID ] = model.uid!!
+                    dataSend[ Common.TO_EMAIL ] = model.email!!
+                    dataSend[ Common.TO_USER ] = model.name!!
+
+                    request.to = p0.child( model.uid!! ).getValue( String::class.java )!!
+                    request.data = dataSend
+
+                    compositeDisposable.add( Common.httpService.sendDuelRequestToUser( request )
+                        .subscribeOn( Schedulers.io() )
+                        .observeOn( AndroidSchedulers.mainThread())
+                        .subscribe( { t: MyResponse? ->
+                            if( t!!.success == 1 )
+                                Toast.makeText( this@AllPeopleActivity,
+                                    "Request sent", Toast.LENGTH_SHORT).show()
+                        }, { t: Throwable? ->
+                                Toast.makeText( this@AllPeopleActivity,
+                                    t!!.message, Toast.LENGTH_SHORT).show()
+                        }))
+                }
+            }
+        })
+    }
+
     override fun onStop() {
         if( adapter != null)
             adapter!!.stopListening()
         if( searchAdapter != null)
             searchAdapter!!.stopListening()
 
+        compositeDisposable.clear()
         super.onStop()
     }
 

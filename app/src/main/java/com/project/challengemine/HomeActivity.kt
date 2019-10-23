@@ -41,7 +41,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_show_people, R.id.nav_friend_request, R.id.nav_sign_out
+                R.id.nav_show_people, R.id.nav_duel_request, R.id.nav_history, R.id.nav_sign_out
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -65,8 +65,11 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_show_people -> {
                 startActivity( Intent( this@HomeActivity, AllPeopleActivity::class.java ))
             }
-            R.id.nav_friend_request -> {
+            R.id.nav_duel_request -> {
 
+            }
+            R.id.nav_history -> {
+                startActivity( Intent( this@HomeActivity, HistoryActivity::class.java ))
             }
             R.id.nav_sign_out -> {
                 AuthUI.getInstance().signOut( this );

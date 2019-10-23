@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
                         if( dataSnapshot.value == null ) {
                             //user doesn't exist
                             if( ! dataSnapshot.child( firebaseUser.uid ).exists() ) {
-                                Common.loggedUser = User( firebaseUser.uid, firebaseUser.email!! );
+                                Common.loggedUser = User( firebaseUser.uid, firebaseUser.email!!, firebaseUser.displayName!! );
 
                                 //add user to db
                                 user_information.child( Common.loggedUser.uid!! )
