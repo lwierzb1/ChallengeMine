@@ -147,7 +147,7 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
             override fun onDataChange(p0: DataSnapshot) {
                 for( userSnapshot in p0.children ) {
                     val user = userSnapshot.getValue( User::class.java )
-                    lstUserEmail.add( user!!.email!! )
+                     lstUserEmail.add( user!!.email!! )
                 }
 
                 iFirebaseLoadDone.onFirebaseLoadUserDone( lstUserEmail )
@@ -203,9 +203,10 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
             .append( model.name )
             .append( "( ")
             .append( model.email)
-            .append( " )"))
+            .append( " )").toString())
         alertDialog.setIcon( R.drawable.ic_challenge_mine_icon)
         alertDialog.setNegativeButton( "Cancel", { dialogInterface, _ -> dialogInterface.dismiss() })
+
         alertDialog.setPositiveButton( "Send") { _ , _->
             val acceptList = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
                 .child( Common.loggedUser.uid!! )
@@ -259,7 +260,7 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
                     request.to = p0.child( model.uid!! ).getValue( String::class.java )!!
                     request.data = dataSend
 
-                    compositeDisposable.add( Common.httpService.sendDuelRequestToUser( request )
+                    compositeDisposable.add( Common.ifcmService.sendDuelRequestToUser( request )
                         .subscribeOn( Schedulers.io() )
                         .observeOn( AndroidSchedulers.mainThread())
                         .subscribe( { t: MyResponse? ->

@@ -5,6 +5,9 @@ import com.project.challengemine.Remote.IFCMClient
 import com.project.challengemine.Remote.IFCMService
 
 object Common {
+    val DUEL_REQUEST: String = "DUEL_REQUEST"
+
+
     val FROM_USER: String = "FROM_USER"
     val FROM_EMAIL: String = "FROM_EMAIL"
     val FROM_UID: String = "FROM_UID"
@@ -20,7 +23,7 @@ object Common {
     val USER_INFORMATION: String = "UserInformation"
 
 
-    val httpService: IFCMService
+    val ifcmService: IFCMService
         get() = IFCMClient.getClient("https://fcm.googleapis.com")
             .create( IFCMService::class.java )
 }
