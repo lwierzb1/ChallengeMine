@@ -9,6 +9,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.project.challengemine.Model.User
 import com.project.challengemine.R
 import com.project.challengemine.Util.Common
@@ -37,12 +39,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendNotificationWithChannel(p0: RemoteMessage) {
-        val data = p0.data
+
         val title = "Duel request"
+        val toUser =  Gson().fromJson( p0.data[Common.TO_USER], User::class.java)
+        val fromUser =  Gson().fromJson( p0.data[Common.FROM_USER], User::class.java)
+
         val content = StringBuilder("New running duel request ")
-            .append( data[ Common.FROM_USER ] )
+            .append( fromUser.name!! )
             .append( " ( ")
-            .append( data[ Common.FROM_EMAIL ] )
+            .append( fromUser.email!! )
             .append( " )").toString()
         val helper: NotificationHelper = NotificationHelper( this )
         val builder: Notification.Builder = helper.getChallengeMineNotification( title, content )
@@ -52,12 +57,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendNotification(p0: RemoteMessage) {
-        val data = p0.data
-        val title = "Duel Request"
+
+        val title = "Duel request"
+        val toUser =  Gson().fromJson( p0.data[Common.TO_USER], User::class.java)
+        val fromUser =  Gson().fromJson( p0.data[Common.FROM_USER], User::class.java)
+
         val content = StringBuilder("New running duel request ")
-            .append( data[ Common.FROM_USER ] )
+            .append( fromUser.name!! )
             .append( " ( ")
-            .append( data[ Common.FROM_EMAIL ] )
+            .append( fromUser.email!! )
             .append( " )").toString()
 
         val builder = NotificationCompat.Builder( this, "" )
@@ -71,12 +79,17 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun addRequestToUserInformation(data: Map<String, String>) {
-        val duelRequest = FirebaseDatabase.getInstance()
-            .getReference( Common.USER_INFORMATION )
-            .child( data[ Common.TO_UID ]!! )
-            .child( Common.DUEL_REQUEST )
+        val toUser =  Gson().fromJson( data[Common.TO_USER], User::class.java)
+        val fromUser =  Gson().fromJson( data[Common.FROM_USER], User::class.java)
 
-        val user = User( data[ Common.FROM_UID]!!, data[ Common.FROM_EMAIL]!!, data[ Common.FROM_USER]!! )
-        duelRequest.child( user.uid!! ).setValue( user )
+        FirebaseDatabase.getInstance()
+            .getReference( Common.USER_INFORMATION )
+            .child( toUser.uid!! )
+            .child( Common.DUEL_REQUEST )
+            .child( fromUser.uid!! )
+            .setValue( fromUser )
+
+//        val user = User( data[ Common.FROM_UID]!!, data[ Common.FROM_EMAIL]!!, data[ Common.FROM_USER]!! )
+//        duelRequest.child( user.uid!! ).setValue( user )
     }
 }

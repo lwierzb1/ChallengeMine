@@ -18,6 +18,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.gson.Gson
 import com.mancj.materialsearchbar.MaterialSearchBar
 import com.project.challengemine.Interface.IFirebaseLoadDone
 import com.project.challengemine.Interface.IRecyclerItemClickListener
@@ -249,13 +250,8 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
                     val request = Request()
 
                     val dataSend = HashMap< String, String >()
-                    dataSend[ Common.FROM_UID ] = Common.loggedUser.uid!!
-                    dataSend[ Common.FROM_EMAIL ] = Common.loggedUser.email!!
-                    dataSend[ Common.FROM_USER ] = Common.loggedUser.name!!
-
-                    dataSend[ Common.TO_UID ] = model.uid!!
-                    dataSend[ Common.TO_EMAIL ] = model.email!!
-                    dataSend[ Common.TO_USER ] = model.name!!
+                    dataSend[ Common.FROM_USER ] = Gson().toJson( Common.loggedUser )
+                    dataSend[ Common.TO_USER ] = Gson().toJson( model )
 
                     request.to = p0.child( model.uid!! ).getValue( String::class.java )!!
                     request.data = dataSend

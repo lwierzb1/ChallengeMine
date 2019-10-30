@@ -11,12 +11,15 @@ object Common {
     val FROM_USER: String = "FROM_USER"
     val FROM_EMAIL: String = "FROM_EMAIL"
     val FROM_UID: String = "FROM_UID"
+    val FROM_STATISTICS: String = "FROM_STATISTICS"
 
     val TO_USER: String = "TO_USER"
     val TO_EMAIL: String = "TO_EMAIL"
     val TO_UID: String = "TO_UID"
+    val TO_STATISTICS: String = "TO_STATISTICS"
 
     val ACCEPT_LIST: String = "acceptList"
+    val STATISTICS: String = "statistics"
     val USER_UID_SAVE_KEY: String? = "SAVE_KEY"
     val TOKENS: String = "TOKENS"
     lateinit var loggedUser: User
@@ -26,4 +29,5 @@ object Common {
     val ifcmService: IFCMService
         get() = IFCMClient.getClient("https://fcm.googleapis.com")
             .create( IFCMService::class.java )
+
 }

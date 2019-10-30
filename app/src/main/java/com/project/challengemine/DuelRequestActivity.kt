@@ -156,11 +156,11 @@ class DuelRequestActivity : AppCompatActivity(), IFirebaseLoadDone {
     }
 
     private fun addUserToDuel(model: User) {
-//        var accpetList = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
-//            .child( Common.loggedUser.uid!! )
-//            .child( Common.ACCEPT_LIST )
-//
-//        accpetList.child( model.uid!! ).setValue( model )
+        model.statistics!!.duelRequests = model.statistics!!.duelRequests!!.plus(1)
+
+        FirebaseDatabase.getInstance()
+            .getReference( Common.USER_INFORMATION )
+            .child( model.uid!! ).setValue( model )
     }
 
     private fun addToAcceptList(model: User) {
@@ -228,16 +228,16 @@ class DuelRequestActivity : AppCompatActivity(), IFirebaseLoadDone {
             override fun onBindViewHolder(holder: DuelRequestViewHolder, position: Int, model: User) {
                 holder.txt_user_email.text = model.email
 
-                holder.btn_decline.setOnClickListener( {
+                holder.btn_decline.setOnClickListener {
                     deleteDuelRequest(model, true)
 
-                })
-                holder.btn_accept.setOnClickListener( {
+                }
+                holder.btn_accept.setOnClickListener {
                     deleteDuelRequest(model, false)
                     addToAcceptList(model)
                     addUserToDuel(model)
 
-                })
+                }
             }
         }
         searchAdapter!!.startListening()
