@@ -66,7 +66,7 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 startActivity( Intent( this@HomeActivity, AllPeopleActivity::class.java ))
             }
             R.id.nav_duel_request -> {
-                startActivity( Intent( this@HomeActivity, DuelRequestActivity::class.java ))
+                startActivity( Intent( this@HomeActivity, AllDuelRequestsActivity::class.java ))
 
             }
             R.id.nav_history -> {

@@ -1,5 +1,6 @@
 package com.project.challengemine.Remote
 
+import com.project.challengemine.Model.Duel
 import com.project.challengemine.Model.MyResponse
 import com.project.challengemine.Model.Request
 import io.reactivex.Observable

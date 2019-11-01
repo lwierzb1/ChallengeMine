@@ -1,16 +1,23 @@
 package com.project.challengemine.Model
 
-class Duel {
-    var attacker: User
-    var defender: User
-    var type: String
-    lateinit var winner: User
-    lateinit var attackerTime: String
-    lateinit var defenderTime: String
+abstract class Duel {
+    var attacker: User?
+    var defender: User?
 
-    constructor( attacker: User, defender: User, type: String) {
+    lateinit var type: String
+
+    val winner: User? = null
+    val attackerTime: String? = null
+    val defenderTime: String? = null
+    constructor() {
+        this.attacker = null
+        this.defender = null
+    }
+    constructor( attacker: User, defender: User) {
         this.attacker = attacker
         this.defender = defender
-        this.type = type
     }
+
+    abstract fun end()
+    abstract fun getDescription(): String
 }

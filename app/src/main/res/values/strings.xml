@@ -14,4 +14,8 @@
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
+    <string name="title_activity_duels">DuelsActivity</string>
+    <string name="tab_text_1">Distance duels</string>
+    <string name="tab_text_2">Time duels</string>
+    <string name="title_activity_all_duel_requests">AllDuelRequestsActivity</string>
 </resources>

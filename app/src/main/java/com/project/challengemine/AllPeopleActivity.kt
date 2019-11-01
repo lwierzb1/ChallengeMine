@@ -1,5 +1,6 @@
 package com.project.challengemine
 
+import android.content.Intent
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -9,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.database.FirebaseRecyclerAdapter
@@ -22,9 +22,7 @@ import com.google.gson.Gson
 import com.mancj.materialsearchbar.MaterialSearchBar
 import com.project.challengemine.Interface.IFirebaseLoadDone
 import com.project.challengemine.Interface.IRecyclerItemClickListener
-import com.project.challengemine.Model.MyResponse
-import com.project.challengemine.Model.Request
-import com.project.challengemine.Model.User
+import com.project.challengemine.Model.*
 import com.project.challengemine.Util.Common
 import com.project.challengemine.ViewHolder.UserViewHolder
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -43,7 +41,10 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
 
     val compositeDisposable = CompositeDisposable()
 
-
+    companion object {
+        private val MY_REQUEST_CODE = 1221;
+    }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_all_people)
@@ -197,47 +198,91 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
         recycler_all_people.adapter = adapter;
     }
 
-    private fun showDialogRequest(model: User) {
-        var alertDialog = AlertDialog.Builder( this, R.style.MyRequestDialog)
-        alertDialog.setTitle( "Duel Request" )
-        alertDialog.setMessage( StringBuilder("Do You want to send duel request to ")
-            .append( model.name )
-            .append( "( ")
-            .append( model.email)
-            .append( " )").toString())
-        alertDialog.setIcon( R.drawable.ic_challenge_mine_icon)
-        alertDialog.setNegativeButton( "Cancel", { dialogInterface, _ -> dialogInterface.dismiss() })
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
 
-        alertDialog.setPositiveButton( "Send") { _ , _->
-            val acceptList = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
+        if( requestCode == MY_REQUEST_CODE) {
+            val duelType = data?.getStringExtra("duelType");
+            val time = data?.getStringExtra("time");
+            val distance = data?.getStringExtra("distance");
+            val model = Gson().fromJson( data?.getStringExtra("model"), User::class.java )
+
+            if( duelType != null ) {
+                val acceptList = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
                 .child( Common.loggedUser.uid!! )
                 .child( Common.ACCEPT_LIST )
 
-            //check if user is not already in duel
-            acceptList.orderByKey().equalTo( model.uid )
-                .addListenerForSingleValueEvent( object:ValueEventListener {
-                    override fun onCancelled(p0: DatabaseError) {
+                //check if user is not already in duel
+                acceptList.orderByKey().equalTo( model.uid )
+                    .addListenerForSingleValueEvent( object:ValueEventListener {
+                        override fun onCancelled(p0: DatabaseError) {
 
-                    }
+                        }
 
-                    override fun onDataChange(p0: DataSnapshot) {
-                        if (p0.value == null) //not in duel
-                            sendDuelRequest( model )
-                        else
-                            Toast.makeText( this@AllPeopleActivity,
-                                "You are already in duel", Toast.LENGTH_LONG).show()
-                    }
-                })
+                        override fun onDataChange(p0: DataSnapshot) {
+                            //not in duel
+                            if (p0.value == null)  {
+                                if( duelType == Common.DUEL_TYPE_DISTANCE )
+                                    sendDuelRequest( DistanceDuel(Common.loggedUser, model, distance!!.toFloat() ))
+                                else
+                                    sendDuelRequest( TimeDuel(Common.loggedUser, model, time!!.toFloat() ))
+                            }
+                            else
+                                Toast.makeText( this@AllPeopleActivity,
+                                    "You are already in duel", Toast.LENGTH_LONG).show()
+                        }
+                    })
+
+            }
         }
+        loadUserList()
+    }
+    
+    private fun showDialogRequest(model: User) {
+        val intent = Intent(this, ChooseDuel::class.java)
+        intent.putExtra( "model", Gson().toJson( model ))
+        startActivityForResult( intent, MY_REQUEST_CODE);
 
-        alertDialog.show()
+//        var alertDialog = AlertDialog.Builder( this, R.style.MyRequestDialog)
+//        alertDialog.setTitle( "Duel Request" )
+//        alertDialog.setMessage( StringBuilder("Do You want to send duel request to ")
+//            .append( model.name )
+//            .append( "( ")
+//            .append( model.email)
+//            .append( " )").toString())
+//        alertDialog.setIcon( R.drawable.ic_challenge_mine_icon)
+//        alertDialog.setNegativeButton( "Cancel", { dialogInterface, _ -> dialogInterface.dismiss() })
+//
+//        alertDialog.setPositiveButton( "Send") { _ , _->
+//            val acceptList = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
+//                .child( Common.loggedUser.uid!! )
+//                .child( Common.ACCEPT_LIST )
+//
+//            //check if user is not already in duel
+//            acceptList.orderByKey().equalTo( model.uid )
+//                .addListenerForSingleValueEvent( object:ValueEventListener {
+//                    override fun onCancelled(p0: DatabaseError) {
+//
+//                    }
+//
+//                    override fun onDataChange(p0: DataSnapshot) {
+//                        if (p0.value == null) //not in duel
+//                            sendDuelRequest( model )
+//                        else
+//                            Toast.makeText( this@AllPeopleActivity,
+//                                "You are already in duel", Toast.LENGTH_LONG).show()
+//                    }
+//                })
+//        }
+//
+//        alertDialog.show()
     }
 
-    private fun sendDuelRequest(model: User) {
+    private fun sendDuelRequest(model: Duel) {
         //get token to send duel request
 
         val tokens = FirebaseDatabase.getInstance().getReference( Common.TOKENS )
-        tokens.orderByKey().equalTo( model.uid ).addListenerForSingleValueEvent( object:ValueEventListener {
+        tokens.orderByKey().equalTo( model.defender?.uid ).addListenerForSingleValueEvent( object:ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
 
             }
@@ -250,10 +295,11 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
                     val request = Request()
 
                     val dataSend = HashMap< String, String >()
-                    dataSend[ Common.FROM_USER ] = Gson().toJson( Common.loggedUser )
-                    dataSend[ Common.TO_USER ] = Gson().toJson( model )
+                    dataSend[ Common.DUEL_REQUEST ] = Gson().toJson( model )
+                    dataSend[ Common.DUEL_TYPE ] = model.type
 
-                    request.to = p0.child( model.uid!! ).getValue( String::class.java )!!
+
+                    request.to = p0.child( model.defender!!.uid!! ).getValue( String::class.java )!!
                     request.data = dataSend
 
                     compositeDisposable.add( Common.ifcmService.sendDuelRequestToUser( request )

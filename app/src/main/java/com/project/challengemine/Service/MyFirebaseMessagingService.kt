@@ -11,6 +11,9 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.project.challengemine.Model.DistanceDuel
+import com.project.challengemine.Model.Duel
+import com.project.challengemine.Model.TimeDuel
 import com.project.challengemine.Model.User
 import com.project.challengemine.R
 import com.project.challengemine.Util.Common
@@ -41,13 +44,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     private fun sendNotificationWithChannel(p0: RemoteMessage) {
 
         val title = "Duel request"
-        val toUser =  Gson().fromJson( p0.data[Common.TO_USER], User::class.java)
-        val fromUser =  Gson().fromJson( p0.data[Common.FROM_USER], User::class.java)
+        val duel : Duel;
+        if( p0.data[ Common.DUEL_TYPE ] == Common.DUEL_TYPE_TIME )
+            duel = Gson().fromJson(p0.data[Common.DUEL_REQUEST], TimeDuel::class.java)
+        else
+            duel = Gson().fromJson(p0.data[Common.DUEL_REQUEST], DistanceDuel::class.java)
 
         val content = StringBuilder("New running duel request ")
-            .append( fromUser.name!! )
+            .append( duel.attacker!!.name!! )
             .append( " ( ")
-            .append( fromUser.email!! )
+            .append( duel.attacker!!.email!! )
             .append( " )").toString()
         val helper: NotificationHelper = NotificationHelper( this )
         val builder: Notification.Builder = helper.getChallengeMineNotification( title, content )
@@ -79,17 +85,17 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun addRequestToUserInformation(data: Map<String, String>) {
-        val toUser =  Gson().fromJson( data[Common.TO_USER], User::class.java)
-        val fromUser =  Gson().fromJson( data[Common.FROM_USER], User::class.java)
+        val duel : Duel;
+        if( data[ Common.DUEL_TYPE ] == Common.DUEL_TYPE_TIME )
+            duel = Gson().fromJson( data[Common.DUEL_REQUEST], TimeDuel::class.java)
+        else
+            duel = Gson().fromJson( data[Common.DUEL_REQUEST], DistanceDuel::class.java)
 
         FirebaseDatabase.getInstance()
             .getReference( Common.USER_INFORMATION )
-            .child( toUser.uid!! )
-            .child( Common.DUEL_REQUEST )
-            .child( fromUser.uid!! )
-            .setValue( fromUser )
-
-//        val user = User( data[ Common.FROM_UID]!!, data[ Common.FROM_EMAIL]!!, data[ Common.FROM_USER]!! )
-//        duelRequest.child( user.uid!! ).setValue( user )
+            .child( duel.defender!!.uid!! )
+            .child( duel.type )
+            .child( duel.attacker!!.uid!! )
+            .setValue( duel )
     }
 }

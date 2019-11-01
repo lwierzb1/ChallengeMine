@@ -1,14 +1,19 @@
 package com.project.challengemine
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.database.DataSnapshot
@@ -20,81 +25,51 @@ import com.project.challengemine.Interface.IFirebaseLoadDuelDone
 import com.project.challengemine.Model.DistanceDuel
 import com.project.challengemine.Model.Duel
 import com.project.challengemine.Model.TimeDuel
-import com.project.challengemine.Model.User
 import com.project.challengemine.Util.Common
 import com.project.challengemine.ViewHolder.DuelRequestViewHolder
+import kotlinx.android.synthetic.main.activity_all_people.*
 import kotlinx.android.synthetic.main.activity_all_people.material_search_bar
 import kotlinx.android.synthetic.main.activity_duel_request.*
 import kotlinx.android.synthetic.main.distance_fragment.*
 
-class DuelRequestActivity : AppCompatActivity(), IFirebaseLoadDuelDone {
 
-
-    var adapter: FirebaseRecyclerAdapter<Duel, DuelRequestViewHolder>?=null
-    var searchAdapter: FirebaseRecyclerAdapter<Duel, DuelRequestViewHolder>?=null
+class DistanceFragment() : Fragment(), IFirebaseLoadDuelDone {
+    var adapter: FirebaseRecyclerAdapter<DistanceDuel, DuelRequestViewHolder>?=null
 
 
     lateinit var iFirebaseLoadDuelDone: IFirebaseLoadDuelDone
-    var suggestedList:List< String > = ArrayList()
+lateinit var recycler_duel_request: RecyclerView
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_duel_request)
-
-        material_search_bar.setCardViewElevation( 10 )
-        material_search_bar.addTextChangeListener( object: TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                val suggest = ArrayList< String> ()
-
-                for( search in suggestedList )
-                    if( search.toLowerCase().contentEquals( material_search_bar.text.toLowerCase() ))
-                        suggest.add( search )
-
-                material_search_bar.lastSuggestions = suggest
-            }
-        })
-        material_search_bar.setOnSearchActionListener( object: MaterialSearchBar.OnSearchActionListener{
-            override fun onButtonClicked(buttonCode: Int) {
-
-            }
-
-            override fun onSearchStateChanged(enabled: Boolean) {
-                if( !enabled ) {
-                    //close search -> return default
-                    if( adapter != null)
-                        recycler_duel_request.adapter = adapter
-                }
-            }
-
-            override fun onSearchConfirmed(text: CharSequence?) {
-                startSearch( text.toString() )
-            }
-        })
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.distance_fragment, container, false)
+        recycler_duel_request = view.findViewById(R.id.recycler_duel_request) as RecyclerView
         recycler_duel_request.setHasFixedSize( true )
-        val layoutManager = LinearLayoutManager( this )
+        val layoutManager = LinearLayoutManager( activity )
         recycler_duel_request.layoutManager = layoutManager;
-        recycler_duel_request.addItemDecoration( DividerItemDecoration( this, layoutManager.orientation ))
+        recycler_duel_request.addItemDecoration( DividerItemDecoration( activity, layoutManager.orientation ))
 
         iFirebaseLoadDuelDone = this
 
         loadDuelRequestList()
         loadSearchData()
+
+        return view
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+//        setContentView(R.layout.activity_duel_request)
     }
 
     private fun loadSearchData() {
         //get all user
-        val lstDuel = ArrayList< Duel >()
+        val lstDuel = ArrayList< DistanceDuel >()
         val userList = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
             .child( Common.loggedUser.uid!! )
-            .child( Common.DUEL_REQUEST )
+            .child( Common.DUEL_TYPE_DISTANCE )
 
         userList.addListenerForSingleValueEvent( object: ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -103,7 +78,7 @@ class DuelRequestActivity : AppCompatActivity(), IFirebaseLoadDuelDone {
 
             override fun onDataChange(p0: DataSnapshot) {
                 for( userSnapshot in p0.children ) {
-                    val duel = userSnapshot.getValue( TimeDuel::class.java )
+                    val duel = userSnapshot.getValue( DistanceDuel::class.java )
                     lstDuel.add( duel!! )
                 }
 
@@ -116,24 +91,24 @@ class DuelRequestActivity : AppCompatActivity(), IFirebaseLoadDuelDone {
     private fun loadDuelRequestList() {
         val query = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
             .child( Common.loggedUser.uid!! )
-            .child( Common.DUEL_REQUEST )
+            .child( Common.DUEL_TYPE_DISTANCE )
 
-        val options = FirebaseRecyclerOptions.Builder< Duel >()
-            .setQuery( query, Duel::class.java )
+        val options = FirebaseRecyclerOptions.Builder< DistanceDuel >()
+            .setQuery( query, DistanceDuel::class.java )
             .build()
 
-        adapter = object:FirebaseRecyclerAdapter< Duel, DuelRequestViewHolder >( options ) {
+        adapter = object:FirebaseRecyclerAdapter< DistanceDuel, DuelRequestViewHolder >( options ) {
             override fun onCreateViewHolder(
                 parent: ViewGroup,
                 viewType: Int
             ): DuelRequestViewHolder {
-                var itemView = LayoutInflater.from( parent.context )
+                val itemView = LayoutInflater.from( parent.context )
                     .inflate(R.layout.layout_duel_request, parent, false)
 
                 return DuelRequestViewHolder( itemView )
             }
 
-            override fun onBindViewHolder(holder: DuelRequestViewHolder, position: Int, model: Duel) {
+            override fun onBindViewHolder(holder: DuelRequestViewHolder, position: Int, model: DistanceDuel) {
                 holder.txt_user_email.text = model.attacker!!.email
                 holder.txt_descrpition.text = model.getDescription()
 
@@ -155,7 +130,7 @@ class DuelRequestActivity : AppCompatActivity(), IFirebaseLoadDuelDone {
         recycler_duel_request.adapter = adapter;
     }
 
-    private fun addUserToDuel(model: Duel) {
+    private fun addUserToDuel(model: DistanceDuel) {
         model.attacker!!.statistics!!.duelRequests = model.attacker!!.statistics!!.duelRequests!!.plus(1)
 
         FirebaseDatabase.getInstance()
@@ -163,7 +138,7 @@ class DuelRequestActivity : AppCompatActivity(), IFirebaseLoadDuelDone {
             .child( model.attacker!!.uid!! ).setValue( model )
     }
 
-    private fun addToAcceptList(model: Duel) {
+    private fun addToAcceptList(model: DistanceDuel) {
         var accpetList = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
             .child( Common.loggedUser.uid!! )
             .child( Common.ACCEPT_LIST )
@@ -171,20 +146,21 @@ class DuelRequestActivity : AppCompatActivity(), IFirebaseLoadDuelDone {
         accpetList.child( model.attacker!!.uid!! ).setValue( model )
     }
 
-    private fun deleteDuelRequest(model: Duel, isShowMessage: Boolean) {
+    private fun deleteDuelRequest(model: DistanceDuel, isShowMessage: Boolean) {
         val duelRequest = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
             .child( Common.loggedUser.uid!! )
-            .child( Common.DUEL_REQUEST )
+            .child( Common.DUEL_TYPE_DISTANCE )
 
         duelRequest.child( model.attacker!!.uid!! ).removeValue()
             .addOnSuccessListener {
                 run {
                     if (isShowMessage)
                         Toast.makeText(
-                            this@DuelRequestActivity,
+                            activity,
                             "Remove !",
                             Toast.LENGTH_SHORT
                         ).show()
+
                 }
             }
 
@@ -193,8 +169,6 @@ class DuelRequestActivity : AppCompatActivity(), IFirebaseLoadDuelDone {
     override fun onStop() {
         if( adapter != null)
             adapter!!.stopListening()
-        if( searchAdapter != null)
-            searchAdapter!!.stopListening()
 
         super.onStop()
     }
@@ -204,45 +178,19 @@ class DuelRequestActivity : AppCompatActivity(), IFirebaseLoadDuelDone {
     }
 
     override fun onFirebaseLoadDuelFailed(message: String) {
-        Toast.makeText( this, message, Toast.LENGTH_SHORT ).show()
+        Toast.makeText( activity, message, Toast.LENGTH_SHORT ).show()
     }
 
     private fun startSearch( searchString: String ) {
         val query = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
             .child( Common.loggedUser.uid!! )
-            .child( Common.DUEL_REQUEST )
+            .child( Common.DUEL_TYPE_DISTANCE )
             .orderByChild( "email")
 
-        val options = FirebaseRecyclerOptions.Builder< Duel >()
-            .setQuery( query, Duel::class.java )
+        val options = FirebaseRecyclerOptions.Builder< DistanceDuel >()
+            .setQuery( query, DistanceDuel::class.java )
             .build()
 
-        searchAdapter = object:FirebaseRecyclerAdapter<Duel, DuelRequestViewHolder>( options ) {
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DuelRequestViewHolder {
-                var itemView = LayoutInflater.from( parent.context )
-                    .inflate(R.layout.layout_duel_request, parent, false)
-
-                return DuelRequestViewHolder( itemView )
-            }
-
-            override fun onBindViewHolder(holder: DuelRequestViewHolder, position: Int, model: Duel) {
-                holder.txt_user_email.text = model.attacker!!.email
-                holder.txt_descrpition.text = model.getDescription()
-
-                holder.btn_decline.setOnClickListener {
-                    deleteDuelRequest(model, true)
-
-                }
-                holder.btn_accept.setOnClickListener {
-                    deleteDuelRequest(model, false)
-                    addToAcceptList(model)
-                    addUserToDuel(model)
-
-                }
-            }
-        }
-        searchAdapter!!.startListening()
-
-        recycler_duel_request.adapter = searchAdapter;
     }
 }
+

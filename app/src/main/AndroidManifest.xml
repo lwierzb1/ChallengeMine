@@ -11,7 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DuelRequestActivity"></activity>
+        <activity
+            android:name=".AllDuelRequestsActivity"
+            android:label="@string/title_activity_all_duel_requests"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".ChooseDuel" />
+        <activity android:name=".DuelRequestActivity" />
         <activity android:name=".HistoryActivity" />
         <activity
             android:name=".HomeActivity"
