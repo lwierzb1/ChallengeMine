@@ -4,7 +4,10 @@ import com.project.challengemine.Util.Common
 
 class DistanceDuel: Duel {
     override fun getDescription(): String {
-        return StringBuilder( "Distance: ").append( distanceDuel.toString() ).toString()
+        return StringBuilder( "Distance: ")
+            .append( distanceDuel.toString() )
+            .append( " km")
+            .toString()
     }
 
     override fun end() {

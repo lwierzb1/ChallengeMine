@@ -1,5 +1,8 @@
 package com.project.challengemine.Model
 
+import com.google.firebase.database.FirebaseDatabase
+import com.project.challengemine.Util.Common
+
 class User {
     var uid: String? = null;
     var name: String? = null;
@@ -27,5 +30,13 @@ class User {
         this.statistics = statistics;
     }
 
+    fun incrementDuelRequestsAndSaveToDB() {
+        this.statistics!!.duelRequests = this.statistics!!.duelRequests!!.plus(1)
+
+        FirebaseDatabase.getInstance()
+            .getReference( Common.USER_INFORMATION )
+            .child( this.uid!! ).setValue( this )
+
+    }
 
 }

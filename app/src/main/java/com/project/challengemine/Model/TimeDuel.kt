@@ -4,7 +4,10 @@ import com.project.challengemine.Util.Common
 
 class TimeDuel: Duel {
     override fun getDescription(): String {
-        return StringBuilder( "Time: ").append( timeDuel.toString() ).toString()
+        return StringBuilder( "Time: ")
+            .append( timeDuel.toString() )
+            .append( " min")
+            .toString()
     }
 
     override fun end() {

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.NumberPicker
 import android.widget.RadioButton
 import com.project.challengemine.Util.Common
@@ -14,6 +15,9 @@ class ChooseDuel : AppCompatActivity() {
 
     lateinit var radioDistance: RadioButton
     lateinit var radioTime: RadioButton
+
+    lateinit var layoutDistance: LinearLayout
+    lateinit var layoutTime: LinearLayout
 
     lateinit var pickerDistance: NumberPicker
     lateinit var pickerTime: NumberPicker
@@ -33,11 +37,14 @@ class ChooseDuel : AppCompatActivity() {
         pickerDistance = findViewById( R.id.choose_km_duel ) as NumberPicker
         pickerTime = findViewById( R.id.choose_m_duel ) as NumberPicker
 
+        layoutDistance = findViewById( R.id.layout_choose_km_duel ) as LinearLayout
+        layoutTime = findViewById( R.id.layout_choose_m_duel ) as LinearLayout
+
         buttonOk = findViewById( R.id.choose_ok ) as Button
         buttonCancel = findViewById( R.id.choose_cancel ) as Button
 
-        pickerDistance.setVisibility(View.GONE);
-        pickerTime.setVisibility(View.GONE);
+        layoutDistance.visibility = View.GONE
+        layoutTime.visibility = View.GONE
 
         pickerDistance.minValue = 1
         pickerDistance.maxValue = 50
@@ -46,21 +53,21 @@ class ChooseDuel : AppCompatActivity() {
         pickerTime.maxValue = 10
 
         radioDistance.setOnClickListener {
-            pickerTime.setVisibility(View.GONE);
-            pickerDistance.setVisibility(View.VISIBLE)
+            layoutTime.visibility = View.GONE
+            layoutDistance.visibility  = View.VISIBLE
             duelType = Common.DUEL_TYPE_DISTANCE
 
-            buttonOk.setEnabled( true )
+            buttonOk.isEnabled = true
         }
 
         radioTime.setOnClickListener {
-            pickerDistance.setVisibility(View.GONE);
-            pickerTime.setVisibility(View.VISIBLE)
+            layoutDistance.visibility = View.GONE
+            layoutTime.visibility = View.VISIBLE
             duelType = Common.DUEL_TYPE_TIME
-            buttonOk.setEnabled( true )
+            buttonOk.isEnabled = true
         }
 
-        buttonOk.setEnabled( false )
+        buttonOk.isEnabled = false
 
         buttonOk.setOnClickListener {
             val data = Intent()

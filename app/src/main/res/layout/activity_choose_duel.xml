@@ -24,20 +24,49 @@
             android:id="@+id/choose_time_duel"
             />
     </RadioGroup>
-    <NumberPicker
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="20dp"
-        android:id="@+id/choose_m_duel"
         android:layout_centerInParent="true"
-        />
-    <NumberPicker
+        android:id="@+id/layout_choose_m_duel"
+        android:orientation="horizontal">
+
+        <NumberPicker
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:id="@+id/choose_m_duel"
+
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" min."
+            android:layout_gravity="center"/>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="20dp"
-        android:id="@+id/choose_km_duel"
+        android:orientation="horizontal"
+        android:id="@+id/layout_choose_km_duel"
         android:layout_centerInParent="true"
-        />
+        >
+        <NumberPicker
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:id="@+id/choose_km_duel"
+
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" km"
+            android:layout_gravity="center" />
+    </LinearLayout>
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
