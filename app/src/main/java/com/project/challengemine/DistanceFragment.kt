@@ -20,6 +20,13 @@ import com.project.challengemine.Model.DistanceDuel
 import com.project.challengemine.Model.Duel
 import com.project.challengemine.Util.Common
 import com.project.challengemine.ViewHolder.DuelRequestViewHolder
+import android.content.Intent
+import com.esotericsoftware.kryo.util.IntArray
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.google.gson.Gson
+
+
+
 
 class DistanceFragment() : Fragment(), IFirebaseLoadDuelDone {
     var adapter: FirebaseRecyclerAdapter<DistanceDuel, DuelRequestViewHolder>? = null
@@ -114,6 +121,10 @@ class DistanceFragment() : Fragment(), IFirebaseLoadDuelDone {
                     addToAcceptList(model)
                     addUserToDuel(model)
 
+                    val intent = Intent(activity, DistanceDuelActivity::class.java)
+                    intent.putExtra( Common.DUEL_EXTRA_INTENT, Gson().toJson( model ))
+                    startActivity( intent);
+
                 }
             }
 
@@ -124,8 +135,8 @@ class DistanceFragment() : Fragment(), IFirebaseLoadDuelDone {
     }
 
     private fun addUserToDuel(model: DistanceDuel) {
-        model.attacker!!.incrementDuelRequestsAndSaveToDB()
-        model.defender!!.incrementDuelRequestsAndSaveToDB()
+//        model.attacker!!.incrementDuelRequestsAndSaveToDB()
+//        model.defender!!.incrementDuelRequestsAndSaveToDB()
 
     }
 

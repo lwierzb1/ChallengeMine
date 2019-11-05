@@ -7,6 +7,7 @@ import com.project.challengemine.Remote.IFCMService
 object Common {
     val DUEL_REQUEST: String = "DUEL_REQUEST"
     val DUEL_TYPE: String = "DUEL_TYPE"
+    val DUEL_EXTRA_INTENT: String = "DUEL_EXTRA_INTENT"
     val DUEL_TYPE_DISTANCE: String = "DUEL_DISTANCE"
     val DUEL_TYPE_TIME: String = "DUEL_TIME"
 

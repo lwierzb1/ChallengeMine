@@ -3,6 +3,12 @@ package com.project.challengemine.Model
 import com.project.challengemine.Util.Common
 
 class DistanceDuel: Duel {
+    override fun getTitle(): String {
+        return StringBuilder( distanceDuel.toString())
+            .append( " km run")
+            .toString()
+    }
+
     override fun getDescription(): String {
         return StringBuilder( "Distance: ")
             .append( distanceDuel.toString() )

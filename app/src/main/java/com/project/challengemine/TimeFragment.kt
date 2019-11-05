@@ -1,5 +1,6 @@
 package com.project.challengemine
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.gson.Gson
 import com.project.challengemine.Interface.IFirebaseLoadDuelDone
 import com.project.challengemine.Model.Duel
 import com.project.challengemine.Model.TimeDuel
@@ -58,7 +60,7 @@ class TimeFragment() : Fragment(), IFirebaseLoadDuelDone {
         val lstDuel = ArrayList<TimeDuel>()
         val userList = FirebaseDatabase.getInstance().getReference(Common.USER_INFORMATION)
             .child(Common.loggedUser.uid!!)
-            .child(Common.DUEL_TYPE_DISTANCE)
+            .child(Common.DUEL_TYPE_TIME)
 
         userList.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -80,7 +82,7 @@ class TimeFragment() : Fragment(), IFirebaseLoadDuelDone {
     private fun loadDuelRequestList() {
         val query = FirebaseDatabase.getInstance().getReference(Common.USER_INFORMATION)
             .child(Common.loggedUser.uid!!)
-            .child(Common.DUEL_TYPE_DISTANCE)
+            .child(Common.DUEL_TYPE_TIME)
 
         val options = FirebaseRecyclerOptions.Builder<TimeDuel>()
             .setQuery(query, TimeDuel::class.java)
@@ -110,10 +112,13 @@ class TimeFragment() : Fragment(), IFirebaseLoadDuelDone {
 
                 }
                 holder.btn_accept.setOnClickListener {
-                    deleteDuelRequest(model, false)
-                    addToAcceptList(model)
-                    addUserToDuel(model)
+//                    deleteDuelRequest(model, false)
+//                    addToAcceptList(model)
+//                    addUserToDuel(model)
 
+                    val intent = Intent(activity, TimeDuelActivity::class.java)
+                    intent.putExtra( Common.DUEL_EXTRA_INTENT, Gson().toJson( model ))
+                    startActivity( intent);
                 }
             }
 
@@ -124,8 +129,8 @@ class TimeFragment() : Fragment(), IFirebaseLoadDuelDone {
     }
 
     private fun addUserToDuel(model: TimeDuel) {
-        model.attacker!!.incrementDuelRequestsAndSaveToDB()
-        model.defender!!.incrementDuelRequestsAndSaveToDB()
+//        model.attacker!!.incrementDuelRequestsAndSaveToDB()
+//        model.defender!!.incrementDuelRequestsAndSaveToDB()
 
     }
 
@@ -140,7 +145,7 @@ class TimeFragment() : Fragment(), IFirebaseLoadDuelDone {
     private fun deleteDuelRequest(model: TimeDuel, isShowMessage: Boolean) {
         val duelRequest = FirebaseDatabase.getInstance().getReference(Common.USER_INFORMATION)
             .child(Common.loggedUser.uid!!)
-            .child(Common.DUEL_TYPE_DISTANCE)
+            .child(Common.DUEL_TYPE_TIME)
 
         duelRequest.child(model.attacker!!.uid!!).removeValue()
             .addOnSuccessListener {

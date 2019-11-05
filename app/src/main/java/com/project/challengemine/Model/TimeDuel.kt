@@ -10,6 +10,12 @@ class TimeDuel: Duel {
             .toString()
     }
 
+    override fun getTitle(): String {
+        return StringBuilder( timeDuel.toString())
+            .append( " min run")
+            .toString()
+    }
+
     override fun end() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
