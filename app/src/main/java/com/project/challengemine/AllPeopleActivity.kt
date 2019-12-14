@@ -41,8 +41,11 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
 
     val compositeDisposable = CompositeDisposable()
 
+    lateinit var tempDuelType : String
+    lateinit var tempDistanceDuelObj: DistanceDuel
+    lateinit var tempTimeDuelObj: TimeDuel
     companion object {
-        private val MY_REQUEST_CODE = 1221;
+        private val MY_REQUEST_CODE = 1221
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -208,6 +211,19 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
             val model = Gson().fromJson( data?.getStringExtra("model"), User::class.java )
 
             if( duelType != null ) {
+                if( duelType == Common.DUEL_TYPE_TIME ) {
+                    val intent = Intent(this, TimeDuelActivity::class.java)
+                    intent.putExtra(Common.DUEL_EXTRA_INTENT, Gson().toJson(TimeDuel(Common.loggedUser,model,time!!.toFloat())))
+                    startActivity(intent);
+                }
+                else {
+                    val intent = Intent(this, DistanceDuelActivity::class.java)
+                    intent.putExtra(Common.DUEL_EXTRA_INTENT,
+                        Gson().toJson(DistanceDuel(Common.loggedUser,model,distance!!.toFloat())))
+                    startActivity(intent);
+                }
+
+                tempDuelType = duelType
                 val acceptList = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
                 .child( Common.loggedUser.uid!! )
                 .child( Common.ACCEPT_LIST )
@@ -223,9 +239,9 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
                             //not in duel
                             if (p0.value == null)  {
                                 if( duelType == Common.DUEL_TYPE_DISTANCE )
-                                    sendDuelRequest( DistanceDuel(Common.loggedUser, model, distance!!.toFloat() ))
+                                    sendDuelRequest( DistanceDuel(Common.loggedUser,model,distance!!.toFloat()) )
                                 else
-                                    sendDuelRequest( TimeDuel(Common.loggedUser, model, time!!.toFloat() ))
+                                    sendDuelRequest( TimeDuel(Common.loggedUser,model,time!!.toFloat()))
                             }
                             else
                                 Toast.makeText( this@AllPeopleActivity,
@@ -306,9 +322,12 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
                         .subscribeOn( Schedulers.io() )
                         .observeOn( AndroidSchedulers.mainThread())
                         .subscribe( { t: MyResponse? ->
-                            if( t!!.success == 1 )
-                                Toast.makeText( this@AllPeopleActivity,
-                                    "Request sent", Toast.LENGTH_SHORT).show()
+                            if( t!!.success == 1 ) {
+                                Toast.makeText(
+                                    this@AllPeopleActivity,
+                                    "Request sent", Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }, { t: Throwable? ->
                                 Toast.makeText( this@AllPeopleActivity,
                                     t!!.message, Toast.LENGTH_SHORT).show()

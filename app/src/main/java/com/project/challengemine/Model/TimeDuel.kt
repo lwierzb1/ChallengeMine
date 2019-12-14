@@ -1,5 +1,6 @@
 package com.project.challengemine.Model
 
+import com.google.firebase.database.FirebaseDatabase
 import com.project.challengemine.Util.Common
 
 class TimeDuel: Duel {
@@ -15,9 +16,55 @@ class TimeDuel: Duel {
             .append( " min run")
             .toString()
     }
-
+    override fun start(){
+        started = true
+        if( type == Common.DUEL_TYPE_TIME ){
+            FirebaseDatabase.getInstance()
+                .getReference( Common.USER_INFORMATION )
+                .child( defender!!.uid!! )
+                .child( Common.DUEL_TYPE_TIME )
+                .child( attacker!!.uid!! )
+                .setValue( this )
+        }
+        else {
+            FirebaseDatabase.getInstance()
+                .getReference( Common.USER_INFORMATION )
+                .child( defender!!.uid!! )
+                .child( Common.DUEL_TYPE_DISTANCE )
+                .child( attacker!!.uid!! )
+                .setValue( this )
+        }
+    }
     override fun end() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        ended = true
+        if( distanceAttacker > distanceDefender)
+            winner = attacker
+        else
+            winner = defender
+
+        if( type == Common.DUEL_TYPE_TIME ){
+            FirebaseDatabase.getInstance()
+                .getReference( Common.USER_INFORMATION )
+                .child( defender!!.uid!! )
+                .child( Common.DUEL_TYPE_TIME )
+                .child( attacker!!.uid!! )
+                .setValue( this )
+        }
+        else {
+            FirebaseDatabase.getInstance()
+                .getReference( Common.USER_INFORMATION )
+                .child( defender!!.uid!! )
+                .child( Common.DUEL_TYPE_DISTANCE )
+                .child( attacker!!.uid!! )
+                .setValue( this )
+        }
+
+
+//        FirebaseDatabase.getInstance()
+//            .getReference( Common.USER_INFORMATION )
+//            .child( winner!!.uid!! )
+//            .child( Common.STATISTICS )
+//            .child( "wonDuels" )
     }
 
     var timeDuel: Float

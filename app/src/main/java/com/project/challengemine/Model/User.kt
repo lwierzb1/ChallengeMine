@@ -36,7 +36,6 @@ class User {
         FirebaseDatabase.getInstance()
             .getReference( Common.USER_INFORMATION )
             .child( this.uid!! ).setValue( this )
-
     }
 
 }

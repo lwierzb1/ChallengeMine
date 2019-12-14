@@ -20,6 +20,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.project.challengemine.Model.User
+import com.project.challengemine.Service.GoogleMapsService
 import com.project.challengemine.Util.Common
 import io.paperdb.Paper
 import java.util.*
@@ -35,7 +36,6 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var user_information:DatabaseReference;
     lateinit var providers:List<AuthUI.IdpConfig>;
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

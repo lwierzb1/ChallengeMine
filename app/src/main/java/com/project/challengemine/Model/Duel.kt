@@ -6,11 +6,18 @@ abstract class Duel {
     var attacker: User?
     var defender: User?
 
+    var opponentOnline: Boolean = false
+    var ended: Boolean = false
+    var started: Boolean = false
+
     lateinit var type: String
 
-    val winner: User? = null
+    var winner: User? = null
     val attackerTime: String? = null
     val defenderTime: String? = null
+
+    var distanceAttacker: Double = 0.0
+    var distanceDefender: Double = 0.0
 
     val requestDate: Date?
 
@@ -26,6 +33,7 @@ abstract class Duel {
     }
 
     abstract fun end()
+    abstract fun start()
     abstract fun getDescription(): String
     abstract fun getTitle(): String
 }

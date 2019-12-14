@@ -18,11 +18,13 @@ import android.view.MenuItem
 import androidx.core.view.GravityCompat
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
+import com.project.challengemine.Service.GoogleMapsService
 import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
+    var l: GoogleMapsService = GoogleMapsService();
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

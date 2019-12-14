@@ -16,6 +16,9 @@ class DistanceDuel: Duel {
             .toString()
     }
 
+    override fun start() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
     override fun end() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
