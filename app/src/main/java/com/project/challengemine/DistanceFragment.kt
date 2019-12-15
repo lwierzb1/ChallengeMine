@@ -117,9 +117,9 @@ class DistanceFragment() : Fragment(), IFirebaseLoadDuelDone {
 
                 }
                 holder.btn_accept.setOnClickListener {
-                    deleteDuelRequest(model, false)
-                    addToAcceptList(model)
-                    addUserToDuel(model)
+//                    deleteDuelRequest(model, false)
+//                    addToAcceptList(model)
+//                    addUserToDuel(model)
 
                     val intent = Intent(activity, DistanceDuelActivity::class.java)
                     intent.putExtra( Common.DUEL_EXTRA_INTENT, Gson().toJson( model ))

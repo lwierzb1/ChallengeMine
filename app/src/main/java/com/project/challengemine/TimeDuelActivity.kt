@@ -29,13 +29,12 @@ class TimeDuelActivity : AppCompatActivity() {
 
     lateinit var duel: TimeDuel
     lateinit var duelDB: TimeDuel
-    val ha = Handler()
-    val timeIsUpHandler = Handler()
+
+    val oneSecondHandler = Handler()
     lateinit var opponent: User
 
     var duelStarted: Boolean = false
-    lateinit var runnable: Runnable
-    var ticks: Int = 0
+    var duration: Int = 0
     var wpamTimer = WPAMTimer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,15 +45,16 @@ class TimeDuelActivity : AppCompatActivity() {
 
         attakcer_txt = findViewById( R.id.time_text_attacker ) as TextView
         defender_txt = findViewById( R.id.time_text_defender ) as TextView
+
         button_start = findViewById( R.id.button_start ) as Button
+        button_start.setEnabled( false )
+
         timer_elapsed = findViewById( R.id.time_elapsed ) as TextView
         timer_elapsed.setVisibility( View.INVISIBLE )
 
-
-
         duel = Gson().fromJson( intent.getStringExtra( Common.DUEL_EXTRA_INTENT ), TimeDuel::class.java)
-        duel.opponentOnline = true
-        ticks = (duel.timeDuel * 60).toInt()
+
+        duration = (duel.timeDuel * 60).toInt()
 
         attakcer_txt.text = duel.attacker!!.name
         defender_txt.text = duel.defender!!.name
@@ -84,19 +84,17 @@ class TimeDuelActivity : AppCompatActivity() {
             button_start.setVisibility( View.INVISIBLE )
         }
 
-        ha.postDelayed(object : Runnable {
-
+        oneSecondHandler.postDelayed(object : Runnable {
             override fun run() {
                 if (::duelDB.isInitialized) {
                     if (duelDB.started) {
-                        ticks -= 1
-                        if (ticks == 0) {
+                        duration -= 1
+                        if (duration == 0) {
                             duel.end()
                             onDuelStop()
                         }
                     }
                 }
-
 
                 if (::duelDB.isInitialized) {
 
@@ -113,20 +111,21 @@ class TimeDuelActivity : AppCompatActivity() {
                 duelUser.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onCancelled(p0: DatabaseError) {}
                     override fun onDataChange(p0: DataSnapshot) {
-                        duelDB = p0.getValue(TimeDuel::class.java)!!
-                        button_start.setEnabled(duelDB.opponentOnline)
+                        if( p0.getValue(TimeDuel::class.java) != null) {
+                            duelDB = p0.getValue(TimeDuel::class.java)!!
+                            button_start.setEnabled(duelDB.opponentOnline)
+                        }
                     }
 
                 })
-
-                ha.postDelayed(this, 1000)
+                oneSecondHandler.postDelayed(this, 1000)
             }
-        }, 5000)
+        }, 100)
 
     }
 
     private fun onDuelStop() {
-        ha.removeCallbacksAndMessages(null)
+        oneSecondHandler.removeCallbacksAndMessages(null);
         //timeIsUpHandler.removeCallbacksAndMessages( null )
 
         Toast.makeText( this, "Time is up!!!",
@@ -134,7 +133,6 @@ class TimeDuelActivity : AppCompatActivity() {
     }
     override fun onStop() {
         super.onStop()
-        ha.removeCallbacksAndMessages(null);
-
+        oneSecondHandler.removeCallbacksAndMessages(null);
     }
 }

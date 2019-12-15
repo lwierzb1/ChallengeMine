@@ -18,22 +18,22 @@ class TimeDuel: Duel {
     }
     override fun start(){
         started = true
-        if( type == Common.DUEL_TYPE_TIME ){
+//        if( type == Common.DUEL_TYPE_TIME ){
             FirebaseDatabase.getInstance()
                 .getReference( Common.USER_INFORMATION )
                 .child( defender!!.uid!! )
                 .child( Common.DUEL_TYPE_TIME )
                 .child( attacker!!.uid!! )
                 .setValue( this )
-        }
-        else {
-            FirebaseDatabase.getInstance()
-                .getReference( Common.USER_INFORMATION )
-                .child( defender!!.uid!! )
-                .child( Common.DUEL_TYPE_DISTANCE )
-                .child( attacker!!.uid!! )
-                .setValue( this )
-        }
+//        }
+//        else {
+//            FirebaseDatabase.getInstance()
+//                .getReference( Common.USER_INFORMATION )
+//                .child( defender!!.uid!! )
+//                .child( Common.DUEL_TYPE_DISTANCE )
+//                .child( attacker!!.uid!! )
+//                .setValue( this )
+//        }
     }
     override fun end() {
         ended = true
@@ -42,22 +42,22 @@ class TimeDuel: Duel {
         else
             winner = defender
 
-        if( type == Common.DUEL_TYPE_TIME ){
+//        if( type == Common.DUEL_TYPE_TIME ){
             FirebaseDatabase.getInstance()
                 .getReference( Common.USER_INFORMATION )
                 .child( defender!!.uid!! )
                 .child( Common.DUEL_TYPE_TIME )
                 .child( attacker!!.uid!! )
                 .setValue( this )
-        }
-        else {
-            FirebaseDatabase.getInstance()
-                .getReference( Common.USER_INFORMATION )
-                .child( defender!!.uid!! )
-                .child( Common.DUEL_TYPE_DISTANCE )
-                .child( attacker!!.uid!! )
-                .setValue( this )
-        }
+//        }
+//        else {
+//            FirebaseDatabase.getInstance()
+//                .getReference( Common.USER_INFORMATION )
+//                .child( defender!!.uid!! )
+//                .child( Common.DUEL_TYPE_DISTANCE )
+//                .child( attacker!!.uid!! )
+//                .setValue( this )
+//        }
 
 
 //        FirebaseDatabase.getInstance()
@@ -72,11 +72,13 @@ class TimeDuel: Duel {
     constructor() : super() {
         this.timeDuel = 0F
         this.type = Common.DUEL_TYPE_TIME
+        this.started = false
     }
 
     constructor( attacker: User, defender: User, timeDuel: Float ) : super(attacker, defender) {
         this.timeDuel = timeDuel
         this.type = Common.DUEL_TYPE_TIME
+        this.started = false
 
     }
 }
