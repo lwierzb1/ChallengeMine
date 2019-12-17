@@ -36,9 +36,11 @@ class TimeDuelActivity : AppCompatActivity() {
     var duelStarted: Boolean = false
     var duration: Int = 0
     var wpamTimer = WPAMTimer()
+    lateinit var locationService: WPAMLocation
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        locationService = WPAMLocation( this )
         setContentView(R.layout.activity_time_duel)
 
         time_duel_title = findViewById( R.id.time_duel_title ) as TextView
@@ -89,6 +91,8 @@ class TimeDuelActivity : AppCompatActivity() {
                 if (::duelDB.isInitialized) {
                     if (duelDB.started) {
                         duration -= 1
+                        locationService.process()
+                        var dist =  locationService.computeDistance()
                         if (duration == 0) {
                             duel.end()
                             onDuelStop()

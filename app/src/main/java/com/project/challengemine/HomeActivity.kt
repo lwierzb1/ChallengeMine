@@ -3,7 +3,6 @@ package com.project.challengemine
 import android.content.Intent
 import android.os.Bundle
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -17,17 +16,18 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.core.view.GravityCompat
 import com.firebase.ui.auth.AuthUI
-import com.google.firebase.auth.FirebaseAuth
-import com.project.challengemine.Service.GoogleMapsService
 import kotlinx.android.synthetic.main.activity_home.*
+import im.delight.android.location.SimpleLocation
+
 
 class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    var l: GoogleMapsService = GoogleMapsService();
+    private lateinit var location: SimpleLocation
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_home)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
