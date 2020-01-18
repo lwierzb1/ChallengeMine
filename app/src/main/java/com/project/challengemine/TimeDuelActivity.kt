@@ -8,11 +8,21 @@ import com.project.challengemine.Util.Common
 import android.os.Handler
 import android.view.View
 import android.widget.*
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.project.challengemine.Model.User
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.LatLng
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import com.esotericsoftware.kryo.util.IntArray
+import com.google.android.gms.common.internal.Constants
 
 
 class TimeDuelActivity : AppCompatActivity() {
@@ -23,12 +33,15 @@ class TimeDuelActivity : AppCompatActivity() {
     lateinit var defender_txt: TextView
     lateinit var timer_elapsed: TextView
 
-    lateinit var attacker_time: ProgressBar
-    lateinit var defender_time: ProgressBar
+    lateinit var attacker_km : TextView
+    lateinit var defender_km: TextView
     lateinit var button_start: Button
 
     lateinit var duel: TimeDuel
     lateinit var duelDB: TimeDuel
+
+    lateinit var mapFragment : SupportMapFragment
+    lateinit var googleMap: GoogleMap
 
     val oneSecondHandler = Handler()
     lateinit var opponent: User
@@ -61,6 +74,23 @@ class TimeDuelActivity : AppCompatActivity() {
         attakcer_txt.text = duel.attacker!!.name
         defender_txt.text = duel.defender!!.name
 
+        mapFragment = supportFragmentManager.findFragmentById( R.id.map )as SupportMapFragment
+        mapFragment.getMapAsync( OnMapReadyCallback {
+            googleMap = it
+            googleMap.isMyLocationEnabled = true
+
+            var location = googleMap.myLocation
+            var myLocation : LatLng
+
+            if (location != null) {
+                myLocation = LatLng(
+                    location.getLatitude(),
+                    location.getLongitude()
+                )
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 14.0f));
+            }
+        })
+
         if( Common.loggedUser.name.equals( duel.attacker!!.name ) )
             opponent = duel.defender!!
         else
@@ -68,8 +98,8 @@ class TimeDuelActivity : AppCompatActivity() {
 
         time_duel_title.text = duel.getTitle()
 
-        attacker_time = findViewById( R.id.time_progress_atacker ) as ProgressBar
-        defender_time = findViewById( R.id.time_progress_defender ) as ProgressBar
+        attacker_km = findViewById( R.id.distance_text_attacker ) as TextView
+        defender_km = findViewById( R.id.distance_text_defender ) as TextView
 
         val duelUser= FirebaseDatabase.getInstance().getReference(Common.USER_INFORMATION)
             .child( duel.defender!!.uid!! )
@@ -88,11 +118,27 @@ class TimeDuelActivity : AppCompatActivity() {
 
         oneSecondHandler.postDelayed(object : Runnable {
             override fun run() {
+                locationService.process()
+                var dist =  locationService.computeDistance()
                 if (::duelDB.isInitialized) {
                     if (duelDB.started) {
                         duration -= 1
                         locationService.process()
                         var dist =  locationService.computeDistance()
+
+                        if( Common.loggedUser.uid.equals( duel.defender!!.uid )) {
+                            var dist =  locationService.computeDistance()
+                            duelUser.child("distanceDefender").setValue(dist)
+                        }
+                        if ( Common.loggedUser.uid.equals( duel.attacker!!.uid ) ){
+                            var dist =  locationService.computeDistance()
+                            duelUser.child("distanceAttacker").setValue(dist)
+                        }
+
+
+                        attacker_km.text = duelDB.distanceAttacker.toString()
+                        defender_km.text = duelDB.distanceDefender.toString()
+
                         if (duration == 0) {
                             duel.end()
                             onDuelStop()
@@ -104,7 +150,7 @@ class TimeDuelActivity : AppCompatActivity() {
 
                     if (duelDB.started) {
                         wpamTimer.incSeconds()
-                        timer_elapsed.setText(wpamTimer.timeToString())
+                        timer_elapsed.text = wpamTimer.timeToString()
                         timer_elapsed.setVisibility(View.VISIBLE)
                     }
 

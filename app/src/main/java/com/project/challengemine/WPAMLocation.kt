@@ -3,6 +3,7 @@ package com.project.challengemine
 import android.content.Context
 import im.delight.android.location.SimpleLocation
 import im.delight.android.location.SimpleLocation.Listener
+import kotlin.math.abs
 
 class WPAMLocation {
     private lateinit var location: SimpleLocation
@@ -22,10 +23,10 @@ class WPAMLocation {
 
         location.beginUpdates()
         currentLat = location.latitude
-        lastLat = location.longitude
+        currentLong = location.longitude
 
-        currentLong = currentLat
-        lastLong = lastLat
+        lastLat = currentLat
+        lastLong = currentLong
     }
     fun process() {
         lastLat = currentLat
@@ -35,7 +36,7 @@ class WPAMLocation {
         currentLong = location.longitude
     }
     fun computeDistance(): Double {
-        if( lastLat.compareTo(  currentLat ) != 0 || lastLong.compareTo( currentLong ) != 0)
+        if( abs( currentLat - lastLat) >  0.001 || abs(currentLong - lastLong) > 0.001 )
             distance += SimpleLocation.calculateDistance( lastLat, lastLong, currentLat, currentLong)
 
         return distance

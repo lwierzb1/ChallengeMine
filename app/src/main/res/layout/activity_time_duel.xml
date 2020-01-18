@@ -13,15 +13,20 @@
         android:orientation="vertical"
         android:layout_centerInParent="true"
         >
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/time_duel_title"
             android:text="title"
-            android:layout_marginBottom="50dp"
+            android:layout_marginBottom="1dp"
             android:textSize="30dp"
             />
-
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:id="@+id/map"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -55,13 +60,14 @@
                         android:layout_marginLeft="10dp"
                         />
                 </LinearLayout>
-                <ProgressBar
-                    android:id="@+id/time_progress_atacker"
+                <TextView
+                    android:id="@+id/distance_text_attacker"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    style="@android:style/Widget.ProgressBar.Horizontal"
-                    android:progressDrawable="@drawable/progressbar_states"
-
+                    android:layout_height="wrap_content"
+                    android:text="0.0 km"
+                    android:layout_gravity="center"
+                    android:textSize="14dp"
+                    android:layout_marginTop="150px"
                     />
             </LinearLayout>
             <LinearLayout
@@ -89,13 +95,14 @@
                         android:layout_marginLeft="10dp"
                         />
                 </LinearLayout>
-                <ProgressBar
-                    android:id="@+id/time_progress_defender"
+                <TextView
+                    android:id="@+id/distance_text_defender"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    style="@android:style/Widget.ProgressBar.Horizontal"
-                    android:progressDrawable="@drawable/progressbar_states"
-
+                    android:layout_height="wrap_content"
+                    android:text="0.0 km"
+                    android:layout_gravity="center"
+                    android:textSize="14dp"
+                    android:layout_marginTop="150px"
                     />
             </LinearLayout>
         </LinearLayout>
@@ -104,7 +111,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="START"
-            android:layout_marginTop="50px">
+            android:layout_marginTop="150px">
         </Button>
         <TextView
             android:layout_width="wrap_content"
