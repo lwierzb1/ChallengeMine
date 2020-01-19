@@ -19,7 +19,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/time_duel_title"
             android:text="title"
-            android:layout_marginBottom="1dp"
             android:textSize="30dp"
             />
         <fragment
@@ -111,7 +110,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="START"
-            android:layout_marginTop="150px">
+            android:layout_marginTop="50px">
         </Button>
         <TextView
             android:layout_width="wrap_content"

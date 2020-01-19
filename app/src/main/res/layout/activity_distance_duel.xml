@@ -18,15 +18,17 @@
             android:layout_height="wrap_content"
             android:id="@+id/distance_duel_title"
             android:text="title"
-            android:layout_marginBottom="50dp"
             android:textSize="30dp"
             />
-
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:id="@+id/map"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-
             android:gravity="center"
             >
             <LinearLayout
@@ -58,7 +60,7 @@
                 <ProgressBar
                     android:id="@+id/distance_progress_atacker"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="150dp"
                     style="@android:style/Widget.ProgressBar.Horizontal"
                     android:progressDrawable="@drawable/progressbar_states"
 
@@ -92,7 +94,7 @@
                 <ProgressBar
                     android:id="@+id/distance_progress_defender"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="150dp"
                     style="@android:style/Widget.ProgressBar.Horizontal"
                     android:progressDrawable="@drawable/progressbar_states"
 

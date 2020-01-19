@@ -5,6 +5,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -30,14 +35,23 @@ class DistanceDuelActivity : AppCompatActivity() {
     lateinit var duel: DistanceDuel
     lateinit var duelDB: DistanceDuel
 
+    lateinit var mapFragment : SupportMapFragment
+    lateinit var googleMap: GoogleMap
+
     val oneSecondHandler = Handler()
     lateinit var opponent: User
 
     var duelStarted: Boolean = false
+
     var wpamTimer = WPAMTimer()
+
+    lateinit var locationService: WPAMLocation
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        locationService = WPAMLocation( this )
+
         setContentView(R.layout.activity_distance_duel)
 
         distance_duel_title = findViewById( R.id.distance_duel_title ) as TextView
@@ -55,10 +69,30 @@ class DistanceDuelActivity : AppCompatActivity() {
         attakcer_txt.text = duel.attacker!!.name
         defender_txt.text = duel.defender!!.name
 
+        mapFragment = supportFragmentManager.findFragmentById( R.id.map )as SupportMapFragment
+        mapFragment.getMapAsync( OnMapReadyCallback {
+            googleMap = it
+            googleMap.isMyLocationEnabled = true
+
+            var location = googleMap.myLocation
+            var myLocation : LatLng
+
+            if (location != null) {
+                myLocation = LatLng(
+                    location.getLatitude(),
+                    location.getLongitude()
+                )
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 14.0f));
+            }
+        })
+
         distance_duel_title.text = duel.getTitle()
 
         attacker_distance = findViewById( R.id.distance_progress_atacker ) as ProgressBar
         defender_distance = findViewById( R.id.distance_progress_defender ) as ProgressBar
+
+        attacker_distance.max = duel.distanceDuel.toInt()
+        defender_distance.max = duel.distanceDuel.toInt()
 
         val duelUser= FirebaseDatabase.getInstance().getReference(Common.USER_INFORMATION)
             .child( duel.defender!!.uid!! )
@@ -70,6 +104,11 @@ class DistanceDuelActivity : AppCompatActivity() {
             button_start.setVisibility( View.INVISIBLE )
         }
 
+        if( Common.loggedUser.name.equals( duel.attacker!!.name ) )
+            opponent = duel.defender!!
+        else
+            opponent = duel.attacker!!
+
         button_start.setOnClickListener {
             duelUser.child("started").setValue( true )
             button_start.setVisibility( View.INVISIBLE )
@@ -78,15 +117,33 @@ class DistanceDuelActivity : AppCompatActivity() {
         oneSecondHandler.postDelayed(object : Runnable {
             override fun run() {
                 if (::duelDB.isInitialized) {
-
                     if (duelDB.started) {
-                        wpamTimer.incSeconds()
-                        timer_elapsed.setText(wpamTimer.timeToString())
-                        timer_elapsed.setVisibility(View.VISIBLE)
+                        if( !duel.ended )
+                            wpamTimer.incSeconds()
+
+                        timer_elapsed.text = wpamTimer.timeToString()
+                        timer_elapsed.visibility = View.VISIBLE
+
+                        locationService.process()
+                        var dist =  locationService.computeDistance()
+
+                        if( Common.loggedUser.uid.equals( duel.defender!!.uid )) {
+                            duelUser.child("distanceDefender").setValue(dist)
+                        }
+                        if ( Common.loggedUser.uid.equals( duel.attacker!!.uid ) ){
+                            var dist =  locationService.computeDistance()
+                            duelUser.child("distanceAttacker").setValue(dist)
+                        }
+                        attacker_distance.progress = duelDB.distanceAttacker.toInt()
+                        defender_distance.progress = duelDB.distanceAttacker.toInt()
+
+
+                        if( dist >= duel.distanceDuel || duel.ended ){
+                                duel.end()
+                                onDuelStop()
+                        }
                     }
 
-                    if (duelDB.ended)
-                        onDuelStop()
                 }
 
                 duelUser.addListenerForSingleValueEvent(object : ValueEventListener {

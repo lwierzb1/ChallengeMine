@@ -118,8 +118,6 @@ class TimeDuelActivity : AppCompatActivity() {
 
         oneSecondHandler.postDelayed(object : Runnable {
             override fun run() {
-                locationService.process()
-                var dist =  locationService.computeDistance()
                 if (::duelDB.isInitialized) {
                     if (duelDB.started) {
                         duration -= 1
@@ -127,7 +125,6 @@ class TimeDuelActivity : AppCompatActivity() {
                         var dist =  locationService.computeDistance()
 
                         if( Common.loggedUser.uid.equals( duel.defender!!.uid )) {
-                            var dist =  locationService.computeDistance()
                             duelUser.child("distanceDefender").setValue(dist)
                         }
                         if ( Common.loggedUser.uid.equals( duel.attacker!!.uid ) ){
