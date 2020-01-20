@@ -112,17 +112,17 @@
             android:background="@android:color/darker_gray"
             android:layout_height="1dp"
             android:layout_marginBottom="5dp"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Recent duels:" />
+<!--        <TextView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Recent duels:" />-->
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/recycler_recent_duels"
-            android:layout_marginTop="10dp"
-            />
+<!--        <androidx.recyclerview.widget.RecyclerView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:id="@+id/recycler_recent_duels"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            />-->
 
     </LinearLayout>
 

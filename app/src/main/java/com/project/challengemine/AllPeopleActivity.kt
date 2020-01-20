@@ -257,41 +257,7 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
     private fun showDialogRequest(model: User) {
         val intent = Intent(this, ChooseDuel::class.java)
         intent.putExtra( "model", Gson().toJson( model ))
-        startActivityForResult( intent, MY_REQUEST_CODE);
-
-//        var alertDialog = AlertDialog.Builder( this, R.style.MyRequestDialog)
-//        alertDialog.setTitle( "Duel Request" )
-//        alertDialog.setMessage( StringBuilder("Do You want to send duel request to ")
-//            .append( model.name )
-//            .append( "( ")
-//            .append( model.email)
-//            .append( " )").toString())
-//        alertDialog.setIcon( R.drawable.ic_challenge_mine_icon)
-//        alertDialog.setNegativeButton( "Cancel", { dialogInterface, _ -> dialogInterface.dismiss() })
-//
-//        alertDialog.setPositiveButton( "Send") { _ , _->
-//            val acceptList = FirebaseDatabase.getInstance().getReference( Common.USER_INFORMATION )
-//                .child( Common.loggedUser.uid!! )
-//                .child( Common.ACCEPT_LIST )
-//
-//            //check if user is not already in duel
-//            acceptList.orderByKey().equalTo( model.uid )
-//                .addListenerForSingleValueEvent( object:ValueEventListener {
-//                    override fun onCancelled(p0: DatabaseError) {
-//
-//                    }
-//
-//                    override fun onDataChange(p0: DataSnapshot) {
-//                        if (p0.value == null) //not in duel
-//                            sendDuelRequest( model )
-//                        else
-//                            Toast.makeText( this@AllPeopleActivity,
-//                                "You are already in duel", Toast.LENGTH_LONG).show()
-//                    }
-//                })
-//        }
-//
-//        alertDialog.show()
+        startActivityForResult( intent, MY_REQUEST_CODE)
     }
 
     private fun sendDuelRequest(model: Duel) {
@@ -308,6 +274,11 @@ class AllPeopleActivity : AppCompatActivity(), IFirebaseLoadDone {
                     Toast.makeText( this@AllPeopleActivity,
                         "Tokens not available", Toast.LENGTH_SHORT).show()
                 else {
+                    val statisticsDefenderDB= FirebaseDatabase.getInstance().getReference(Common.USER_INFORMATION)
+                        .child( model.defender!!.uid!! )
+                        .child( "statistics" )
+
+                    statisticsDefenderDB.child( "duelRequests" ).setValue( model.defender!!.statistics!!.duelRequests!! + 1 );
                     val request = Request()
 
                     val dataSend = HashMap< String, String >()

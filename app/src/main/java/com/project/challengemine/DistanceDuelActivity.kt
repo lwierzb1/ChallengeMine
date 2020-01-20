@@ -131,14 +131,14 @@ class DistanceDuelActivity : AppCompatActivity() {
                             duelUser.child("distanceDefender").setValue(dist)
                         }
                         if ( Common.loggedUser.uid.equals( duel.attacker!!.uid ) ){
-                            var dist =  locationService.computeDistance()
                             duelUser.child("distanceAttacker").setValue(dist)
                         }
                         attacker_distance.progress = duelDB.distanceAttacker.toInt()
-                        defender_distance.progress = duelDB.distanceAttacker.toInt()
+                        defender_distance.progress = duelDB.distanceDefender.toInt()
 
 
-                        if( dist >= duel.distanceDuel || duel.ended ){
+                        if( attacker_distance.progress == attacker_distance.max ||
+                            defender_distance.progress == defender_distance.max ){
                                 duel.end()
                                 onDuelStop()
                         }

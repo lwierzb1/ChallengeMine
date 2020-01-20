@@ -18,18 +18,19 @@ import androidx.core.view.GravityCompat
 import com.firebase.ui.auth.AuthUI
 import kotlinx.android.synthetic.main.activity_home.*
 import im.delight.android.location.SimpleLocation
+import kotlinx.android.synthetic.main.fragment_home.view.*
 
 
 class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var location: SimpleLocation
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_home)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
+
         setSupportActionBar(toolbar)
 
         val fab: FloatingActionButton = findViewById(R.id.fab)

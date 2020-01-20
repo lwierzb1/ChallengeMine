@@ -50,22 +50,17 @@ class DistanceDuel: Duel {
             .child( Common.DUEL_TYPE_TIME )
             .child( attacker!!.uid!! )
             .setValue( this )
-//        }
-//        else {
-//            FirebaseDatabase.getInstance()
-//                .getReference( Common.USER_INFORMATION )
-//                .child( defender!!.uid!! )
-//                .child( Common.DUEL_TYPE_DISTANCE )
-//                .child( attacker!!.uid!! )
-//                .setValue( this )
-//        }
 
+        val statisticsWinnerDB= FirebaseDatabase.getInstance().getReference(Common.USER_INFORMATION)
+            .child( winner!!.uid!! )
+            .child( "statistics" )
 
-//        FirebaseDatabase.getInstance()
-//            .getReference( Common.USER_INFORMATION )
-//            .child( winner!!.uid!! )
-//            .child( Common.STATISTICS )
-//            .child( "wonDuels" )
+        statisticsWinnerDB.child( "duelRequests" ).setValue( winner!!.statistics!!.points!! + 100 );
+
+        val historyWinnerDB= FirebaseDatabase.getInstance().getReference(Common.USER_INFORMATION)
+            .child( winner!!.uid!! )
+            .child( "history" )
+
     }
 
     var distanceDuel: Float
