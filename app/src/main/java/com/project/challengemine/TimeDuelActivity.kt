@@ -136,9 +136,10 @@ class TimeDuelActivity : AppCompatActivity() {
                         attacker_km.text = duelDB.distanceAttacker.toString()
                         defender_km.text = duelDB.distanceDefender.toString()
 
-                        if (duration == 0) {
+                        if (duration == -1) {
                             duel.end()
                             onDuelStop()
+                            return
                         }
                     }
                 }
@@ -151,8 +152,10 @@ class TimeDuelActivity : AppCompatActivity() {
                         timer_elapsed.setVisibility(View.VISIBLE)
                     }
 
-                    if (duelDB.ended)
-                        onDuelStop()
+//                    if (duelDB.ended) {
+//                        onDuelStop()
+//                        return
+//                    }
                 }
 
                 duelUser.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -161,6 +164,7 @@ class TimeDuelActivity : AppCompatActivity() {
                         if( p0.getValue(TimeDuel::class.java) != null) {
                             duelDB = p0.getValue(TimeDuel::class.java)!!
                             button_start.setEnabled(duelDB.opponentOnline)
+
                         }
                     }
 
@@ -175,7 +179,7 @@ class TimeDuelActivity : AppCompatActivity() {
         oneSecondHandler.removeCallbacksAndMessages(null);
         //timeIsUpHandler.removeCallbacksAndMessages( null )
 
-        Toast.makeText( this, "Time is up!!!",
+        Toast.makeText( this, "Time is up!!!\nWon: " + duel.winner!!.name,
             Toast.LENGTH_LONG).show();
     }
     override fun onStop() {

@@ -12,6 +12,11 @@ class WPAMTimer {
         val sec = seconds % 60
         val sb = StringBuilder()
 
-        return sb.append( min ).append(":").append( sec ).toString()
+        var secStr = sec.toString()
+
+        if( sec < 10 )
+            secStr = "0$sec"
+
+        return sb.append( min ).append(":").append( secStr ).toString()
     }
 }

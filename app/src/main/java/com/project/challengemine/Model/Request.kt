@@ -1,5 +1,7 @@
 package com.project.challengemine.Model
 
+import com.google.firebase.messaging.RemoteMessage
+
 class Request {
 
     lateinit var to: String

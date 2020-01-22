@@ -18,22 +18,12 @@ class TimeDuel: Duel {
     }
     override fun start(){
         started = true
-//        if( type == Common.DUEL_TYPE_TIME ){
             FirebaseDatabase.getInstance()
                 .getReference( Common.USER_INFORMATION )
                 .child( defender!!.uid!! )
                 .child( Common.DUEL_TYPE_TIME )
                 .child( attacker!!.uid!! )
                 .setValue( this )
-//        }
-//        else {
-//            FirebaseDatabase.getInstance()
-//                .getReference( Common.USER_INFORMATION )
-//                .child( defender!!.uid!! )
-//                .child( Common.DUEL_TYPE_DISTANCE )
-//                .child( attacker!!.uid!! )
-//                .setValue( this )
-//        }
     }
     override fun end() {
         ended = true
@@ -42,29 +32,23 @@ class TimeDuel: Duel {
         else
             winner = defender
 
-//        if( type == Common.DUEL_TYPE_TIME ){
-            FirebaseDatabase.getInstance()
-                .getReference( Common.USER_INFORMATION )
-                .child( defender!!.uid!! )
-                .child( Common.DUEL_TYPE_TIME )
-                .child( attacker!!.uid!! )
-                .setValue( this )
-//        }
-//        else {
-//            FirebaseDatabase.getInstance()
-//                .getReference( Common.USER_INFORMATION )
-//                .child( defender!!.uid!! )
-//                .child( Common.DUEL_TYPE_DISTANCE )
-//                .child( attacker!!.uid!! )
-//                .setValue( this )
-//        }
 
+        if( Common.loggedUser.uid.equals( winner!!.uid) ){
+            Common.loggedUser.statistics!!.points = Common.loggedUser.statistics!!.points!! + 100
+            Common.loggedUser.statistics!!.wonDuels = Common.loggedUser.statistics!!.wonDuels!! + 1
+            winner!!.statistics = Common.loggedUser.statistics
 
-//        FirebaseDatabase.getInstance()
-//            .getReference( Common.USER_INFORMATION )
-//            .child( winner!!.uid!! )
-//            .child( Common.STATISTICS )
-//            .child( "wonDuels" )
+            val duelUser= FirebaseDatabase.getInstance().getReference(Common.USER_INFORMATION)
+                .child( winner!!.uid!! )
+                .child( "statistics" )
+
+            duelUser.child("points" ).setValue( winner!!.statistics!!.points!! )
+            duelUser.child( "wonDuels" ).setValue( winner!!.statistics!!.wonDuels!! );
+        }
+        val defenderUser= FirebaseDatabase.getInstance().getReference(Common.USER_INFORMATION)
+            .child( defender!!.uid!! )
+            .child( "DUEL_TIME" )
+            .removeValue()
     }
 
     var timeDuel: Float

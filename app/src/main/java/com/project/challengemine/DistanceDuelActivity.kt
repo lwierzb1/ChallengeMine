@@ -91,6 +91,8 @@ class DistanceDuelActivity : AppCompatActivity() {
         attacker_distance = findViewById( R.id.distance_progress_atacker ) as ProgressBar
         defender_distance = findViewById( R.id.distance_progress_defender ) as ProgressBar
 
+        attacker_distance.progress = 0
+        defender_distance.progress = 0
         attacker_distance.max = duel.distanceDuel.toInt()
         defender_distance.max = duel.distanceDuel.toInt()
 
@@ -129,9 +131,11 @@ class DistanceDuelActivity : AppCompatActivity() {
 
                         if( Common.loggedUser.uid.equals( duel.defender!!.uid )) {
                             duelUser.child("distanceDefender").setValue(dist)
+                            duel.distanceDefender = dist
                         }
                         if ( Common.loggedUser.uid.equals( duel.attacker!!.uid ) ){
                             duelUser.child("distanceAttacker").setValue(dist)
+                            duel.distanceAttacker = dist
                         }
                         attacker_distance.progress = duelDB.distanceAttacker.toInt()
                         defender_distance.progress = duelDB.distanceDefender.toInt()
@@ -141,6 +145,7 @@ class DistanceDuelActivity : AppCompatActivity() {
                             defender_distance.progress == defender_distance.max ){
                                 duel.end()
                                 onDuelStop()
+                                return
                         }
                     }
 
@@ -165,7 +170,7 @@ class DistanceDuelActivity : AppCompatActivity() {
         oneSecondHandler.removeCallbacksAndMessages(null);
         //timeIsUpHandler.removeCallbacksAndMessages( null )
 
-        Toast.makeText( this, "Distance achieved!!!",
+        Toast.makeText( this, "Distance achieved by " + duel.winner!!.name +"!!!",
             Toast.LENGTH_LONG).show();
     }
     override fun onStop() {
